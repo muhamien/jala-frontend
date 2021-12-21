@@ -1,9 +1,9 @@
 <template>
-  <l-map style="height: 500px" :zoom="zoom" :center="center">
+  <l-map style="height: 500px" :zoom="zoom" :center="centerPoint" :markers="markerPoint">
     <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
     <!-- <l-marker :lat-lng="markerLatLng"></l-marker> -->
     <l-marker
-      v-for="marker in markers"
+      v-for="marker in markerPoint"
       :key="marker.id"
       :visible="marker.visible"
       :draggable="marker.draggable"
@@ -37,6 +37,7 @@ export default {
     LMarker,
     LIcon,
   },
+  props:['centerPoint','markerPoint'],
   data() {
     return {
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -47,18 +48,14 @@ export default {
       maxZoom: 20,
       staticAnchor: [16, 37],
       price: "Rp. " + 10000,
-      //   center: [-7.671764, 110.079249],
-      center: [4.69513500, 96.74939930],
+      center: [-0.73993970, 100.80000510],
       //   markerLatLng: [-7.671764, 110.179249],
-      markers: [
-        {
-          id: "1",
-          position: { lat: 4.69513500, lng: 96.74939930 },
-          price: "Rp. " + 120000,
-        },
-      ],
+      markers: this.markerPoint,
     };
   },
+  mounted(){
+    // console.log(this.markers)
+  }
 };
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
@@ -70,16 +67,18 @@ Icon.Default.mergeOptions({
 
 <style>
 .markerCustom {
-  background-color: #3727c5;
+  background-color:#3727c5;
   padding: 4px 8px;
   border-radius: 8px;
-  box-shadow: 5px 3px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 5px 3px 10px rgba(160, 160, 160, 0.2);
   text-align: center;
   width: max-content !important;
   height: auto !important;
   margin: 0 !important;
   color: #ffffff;
+  /* top: -100%; */
 }
+
 .markerCustom:before {
   transform: rotate(-90deg);
   content: " ";

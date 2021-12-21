@@ -9,7 +9,13 @@
           <c-flex p="4" align="center">
             <c-text as="b" mr="3">Filter:</c-text>
             <c-select mr="3" v-model="region_id" placeholder="Pilih Lokasi">
-              <option v-for="region in regions" :key="region.id" v-bind:value="region.id">{{region.name}}</option>
+              <option
+                v-for="region in city"
+                :key="region.id"
+                :value="region.id"
+              >
+                {{ region.name }}
+              </option>
             </c-select>
             <c-select mr="3" v-model="size" placeholder="Pilih Size">
               <option value="20">Size 20</option>
@@ -32,7 +38,12 @@
               <option value="190">Size 190</option>
               <option value="200">Size 200</option>
             </c-select>
-            <c-select mr="3" v-model="species" title="species" placeholder="Pilih Species">
+            <c-select
+              mr="3"
+              v-model="species"
+              title="species"
+              placeholder="Pilih Species"
+            >
               <option value="#">Vannamei</option>
             </c-select>
           </c-flex>
@@ -47,14 +58,18 @@
     >
       <c-grid-item :colSpan="[5, 5, 3]" :rowSpan="[2]">
         <c-box bg="white" h="100%" class="card">
-          <c-text py="4" px="3">Persebaran Harga Udang Size {{size}}</c-text>
-          <Leaflet style="height: 300px" />
+          <c-text py="4" px="3">Persebaran Harga Udang Size {{ size }}</c-text>
+          <Leaflet
+            style="height: 300px"
+            :markerPoint="getMarker"
+            :centerPoint="[filterRegion[0].latitude, filterRegion[0].longitude]"
+          />
           <c-flex justify="center" align="center" h="20">
             <c-box h="24px" w="24px" mx="2" bg="gray.300" />
             <c-text> >1 Bulan </c-text>
+            <c-box h="24px" w="24px" mx="2" bg="blue.300" />
             <c-box h="24px" w="24px" mx="2" bg="blue.800" />
             <c-text> >1 Minggu </c-text>
-            <c-box h="24px" w="24px" mx="2" bg="blue.300" />
             <c-text> Baru </c-text>
           </c-flex>
         </c-box>
@@ -65,16 +80,24 @@
         </c-flex>
         <c-simple-grid :columns="[1, 1, 2]" :row="2" :spacing="4" w="100">
           <c-box bg="white" h="100%" p="4" class="card">
-            <c-box class="overflow:hidden;"> a </c-box>
+            <c-box class="overflow:hidden;">
+              <c-text>Card 1</c-text>
+            </c-box>
           </c-box>
           <c-box bg="white" h="100%" p="4" class="card">
-            <c-box class="overflow:hidden;"> a </c-box>
+            <c-box class="overflow:hidden;">
+              <c-text>Card 2</c-text>
+            </c-box>
           </c-box>
           <c-box bg="white" h="100%" p="4" class="card">
-            <c-box class="overflow:hidden;"> a </c-box>
+            <c-box class="overflow:hidden;">
+              <c-text>Card 3</c-text> 
+            </c-box>
           </c-box>
           <c-box bg="white" h="100%" p="4" class="card">
-            <c-box class="overflow:hidden;"> a </c-box>
+            <c-box class="overflow:hidden;">
+              <c-text>Card 4</c-text>
+            </c-box>
           </c-box>
         </c-simple-grid>
       </c-grid-item>
@@ -94,8 +117,8 @@ import {
   CSelect,
 } from "@chakra-ui/vue";
 import Leaflet from "@/components/Leaflet.vue";
-import Regions from "../../src/assets/json/regions.json"
-import Price from "../../src/assets/json/shrimp_prices.json"
+import Regions from "../../src/assets/json/regions.json";
+import Price from "../../src/assets/json/shrimp_prices.json";
 
 export default {
   name: "Home",
@@ -109,19 +132,43 @@ export default {
     CSimpleGrid,
     CSelect,
   },
-  data(){
+  data() {
     return {
-      regions:Regions.data,
-      price:Price.data,
-      size:"100",
-      species:"#",
-      region_id:""
-    }
+      coordinate: [-5.5402181, 105.7996769],
+      city: Regions.data,
+      price: Price.data,
+      size: "100",
+      species: "#",
+      region_id: "11",
+      sizes: "size_" + this.size,
+      markers:this.getMarker
+    };
   },
-  created(){
-      console.log(this.regions)
-      console.log(this.price)
-      console.log(this.region_id)
-  }
+  mounted() {  
+    console.log(this.markers) 
+  },
+  computed: {
+    filterRegion() {
+      return this.city.filter((item) => {
+        return item.id == this.region_id;
+      });
+    }, 
+    filterSize() {
+      return this.price.filter((itemSize) => {
+        return itemSize.province_id === this.region_id;
+      });
+    },
+    getMarker: function() {
+      const fPrice = this.filterSize
+      return fPrice.map(item=>({
+        id:item.id,
+        position:[item.region.latitude,item.region.longitude],
+        price:"Rp."+item["size_"+this.size]
+      })) 
+    },
+  },
+  updated() { 
+    console.log(this.getMarker) 
+  },
 };
 </script>
